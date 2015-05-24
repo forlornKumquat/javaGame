@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--**********************
+Use with caution!  This document brought to you by
+Lukasz Kokoszka.  
+-Do not distribute
+-Do not use without authorization
+-Do not claim it as your own
+-DO not modify without permission
+20150407	-->
+<html>
+<head>
+</head>
+<body>
+	<!--font canvas layer-->
+	<img src="dirt0.png" id="ground0" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="dirt1.png" id="ground1" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="dirt2.png" id="ground2" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="dirt3.png" id="ground3" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="back0.png" id="back0" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="back1.png" id="back1" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="back2.png" id="back2" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="back3.png" id="back3" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="tank0.png" id="tank0" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="tank1.png" id="tank1" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="tank2.png" id="tank2" style="position: absolute; left:0px; top:0px;"></img>
+	<img src="tank3.png" id="tank3" style="position: absolute; left:0px; top:0px;"></img>
+
+	<canvas id="topCanvas" width="1200" height="600" style="position: absolute; left:0px; top:0px;">
+	</canvas>
+	
+	<canvas id="Canvas" width="1200" height="600" style="position: absolute; left:0px; top:0px;">
+	</canvas>
+
+	<canvas id="action" width="1200" height="600" style="position: absolute; left:0px; top:0px;">
+	</canvas>
+	
+	
+<script>
+	//get canvas sizes
+	var x = document.getElementById("Canvas").width;
+	var y = document.getElementById("Canvas").height;
+	
+	var myX = x/2;
+	var myY = y/2;
+
+
+	//var cX;
+	//var cY;
+	//array of co-ordinates
+	var myKeys=[];
+
+	var envPos=0;
+	var screenRes=10;
+	var pixelSize=x/screenRes;
+	var pixelY=y/screenRes;
+	//0 would be the transition environment between rooms. Or just no monst..enemies in 0-environment
+	var env1=[0,1,1,0,1,1,1,2,2,1,1,2,1,2,2,1];
+	var env3=[0,2,1,1,2,1,2,2,2,3,2,3,3,3,2,1];
+	//initialize both canvases
+	var ctx = document.getElementById("Canvas").getContext("2d");
+	var ctx2 = document.getElementById("topCanvas").getContext("2d");
+	var ctx3 = document.getElementById("action").getContext("2d");
+
+	var rPat;
+
+	var img1=[];
+	var img2=[];
+	var tnk=[];
+
+	var tMotion = 0;
+
+	window.onload = function() {
+		tnk.push(document.getElementById("tank0"));
+    	tnk.push(document.getElementById("tank1"));
+    	tnk.push(document.getElementById("tank2"));
+    	tnk.push(document.getElementById("tank3"));
+		img1.push(document.getElementById("ground0"));
+    	img1.push(document.getElementById("ground1"));
+    	img1.push(document.getElementById("ground2"));
+    	img1.push(document.getElementById("ground3"));
+    	img2.push(document.getElementById("back0"));
+    	img2.push(document.getElementById("back1"));
+    	img2.push(document.getElementById("back2"));
+    	img2.push(document.getElementById("back3"));
+
+    	for(i=0;i<screenRes;i++){
+    		for(j=0;j<screenRes;j++){
+    			rPat = Math.random() * 21;
+    			if(rPat < 15) rPat=0;
+    			else if(rPat < 17) rPat=1;
+    			else if(rPat < 19) rPat=2;
+    			else rPat=3;
+				ctx2.drawImage(img2[rPat],i*pixelSize,j*pixelY,pixelSize,pixelY);
+				if(j>=screenRes-3){
+					if(j===screenRes-3){
+						ctx2.drawImage(img1[0],i*pixelSize,j*pixelY,pixelSize,pixelY);
+					}
+					else ctx2.drawImage(img1[Math.floor(Math.random()*3) + 1],i*pixelSize,j*pixelY,pixelSize,pixelY);
+				}
+			}
+		}
+    	
+
+	};
+
+	ctx.globalAlpha=1;
+	ctx.fillStyle = "#00FF00";
+
+	setInterval(drawStuff,15);
+
+	function drawStuff(e){
+
+		changeStats();
+
+		ctx.clearRect(0,0,x,y);
+		//ctx.fillStyle = "#ff0000";
+		//ctx.fillRect(myX,myY,10,10);
+		ctx3.clearRect(0,0,x,y);
+		ctx3.drawImage(tnk[tMotion],myX,5*pixelY,pixelSize*2,pixelY*2);
+		ctx.fillText("X:"+myX,50,30);
+		ctx.fillText("Y:"+myY,50,45);
+		ctx.fillText(env1[3],50,60);
+
+		//ctx.drawImage(img1[0],10,10)
+
+
+
+	}
+
+	function changeStats(){
+		if(myKeys[37]) {
+			myX-=3;
+			tMotion+=3;
+			tMotion%=4;
+		}
+//		if(myKeys[38]) myY-=3;
+		if(myKeys[39]) {
+			myX+=3;
+			tMotion++;
+			tMotion%=4;
+		}
+//		if(myKeys[40]) myY+=3;
+
+		if (myX>=x){
+			for(i=0;i<screenRes;i++){
+	    		for(j=0;j<screenRes;j++){
+	    			rPat = Math.random() * 21;
+	    			if(rPat < 15) rPat=0;
+	    			else if(rPat < 17) rPat=1;
+	    			else if(rPat < 19) rPat=2;
+	    			else rPat=3;
+					ctx2.drawImage(img2[rPat],i*pixelSize,j*pixelY,pixelSize,pixelY);
+					if(j>=screenRes-3){
+						if(j==screenRes-3){
+							ctx2.drawImage(img1[0],i*pixelSize,j*pixelY,pixelSize,pixelY);
+						}
+						else {
+							ctx2.drawImage(img1[Math.floor(Math.random()*3) + 1],i*pixelSize,j*pixelY,pixelSize,pixelY);
+						}
+					}
+				}
+			}
+			myX%=x;
+		}
+		else if (myX<=0) myX=0;
+		myY+=y;
+		myY%=y;
+	}
+		
+
+	window.onkeyup = function(e){
+		var key = e.keyCode ? e.keyCode : e.which;
+		myKeys[key] = false;
+	};
+	window.onkeydown = function(e){
+		var key = e.keyCode ? e.keyCode : e.which;
+		myKeys[key] = true;
+	};
+</script>
+</body>
+</html>
